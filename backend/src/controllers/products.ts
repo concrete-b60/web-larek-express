@@ -4,9 +4,10 @@ import Product from '../models/product';
 import BadRequestError from '../errors/bad-request-error';
 import ConflictError from '../errors/conflict-error';
 import InternalServerError from '../errors/internal-server-error';
+import { HttpStatus } from '../utils/httpStatus'
 
 export const getProducts = (_req: Request, res: Response, next: NextFunction) => Product.find({})
-  .then((products) => res.status(200).send({
+  .then((products) => res.send({
     items: products,
     total: products.length,
   }))
@@ -14,7 +15,7 @@ export const getProducts = (_req: Request, res: Response, next: NextFunction) =>
 
 export const createProduct = (req: Request, res: Response, next: NextFunction) => Product
   .create(req.body)
-  .then((product) => res.status(201).send({ _id: product.id }))
+  .then((product) => res.status(HttpStatus.Created).send({ _id: product.id }))
   .catch((error) => {
     if (error && (error).code === 11000) {
       return next(new ConflictError('Товар с таким title уже существует'));

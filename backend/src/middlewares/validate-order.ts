@@ -6,7 +6,7 @@ const validateOrder = celebrate({
     email: Joi.string().email().required(),
     phone: Joi.string().required(),
     address: Joi.string().required(),
-    total: Joi.number().required(),
+    total: Joi.number().allow(null).required(),
     items: Joi.array().items(Joi.string().required()),
   }),
 });

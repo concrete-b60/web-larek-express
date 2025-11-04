@@ -5,8 +5,7 @@ import mongoose from 'mongoose';
 import path from 'path';
 import { errors } from 'celebrate';
 import { requestLogger, errorLogger, logger } from './middlewares/logger';
-import productRouter from './routes/product';
-import orderRouter from './routes/order';
+import routes from './routes';
 import NotFoundError from './errors/not-found-error';
 import errorHandler from './middlewares/errorHandler';
 
@@ -24,10 +23,7 @@ app.use(express.static(path.join(__dirname, './public')));
 
 app.use(requestLogger);
 
-mongoose.connect(DB_ADDRESS);
-
-app.use('/product', productRouter);
-app.use('/order', orderRouter);
+app.use(routes);
 
 app.use('*', (_req, _res, next) => {
   next(new NotFoundError('Маршрут не найден'));
@@ -37,6 +33,8 @@ app.use(errors());
 app.use(errorLogger);
 app.use(errorHandler);
 
-app.listen(PORT, () => {
-  logger.info(`listening on port ${PORT}`);
-});
+mongoose.connect(DB_ADDRESS).then(() => {
+  app.listen(PORT, () => {
+    logger.info(`listening on port ${PORT}`);
+  });
+}).catch(error => {logger.info('Ошибка подключения к базе данных',error.message); });
